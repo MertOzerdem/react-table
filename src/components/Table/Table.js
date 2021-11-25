@@ -1,5 +1,4 @@
 import styles from './Table.module.css';
-import {tableData} from './dummyData';
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { useSpring, animated } from "react-spring";
@@ -15,17 +14,12 @@ const Cell = (props) => {
 }
 
 const Table = (props) => {
+    const tableData = props.data;
     const style = useSpring({
         from: { opacity: 0,  x: -200 },
         to: { opacity: 1, x: 0 },
         config: { friction: 10, tension: 30 },
     });
-    const sortStyle = useSpring({
-        to: {rotateZ: -90},
-        config: { friction: 10, tension: 20 },
-    });
-
-
     const columnHeaders = Object.keys(tableData[0]);
     const [data, setData] = useState(tableData);
     let sortList = {};
@@ -76,6 +70,7 @@ const Table = (props) => {
             <table className={styles.table}>
                 <tbody className={styles['table-body']}>
                     <tr className={styles.row} >
+                        {console.log(columnHeaders)}
                         {columnHeaders.map((header, key) => {
                             return (
                                 <td key={key} className={styles['row-item']} onClick={() => handleSort(header)}>{header}
