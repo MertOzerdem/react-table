@@ -4,7 +4,11 @@ import Table from './components/Table/Table.js'
 function App() {
   return (
     <div className="App">
-      <Table />
+      <Table>
+        <div>
+          <button></button>
+        </div>
+      </Table>
     </div>
   );
 }

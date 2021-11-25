@@ -10,67 +10,83 @@
     font-family: 'Courier New', Courier, monospace;
     font-weight: 700;
     text-shadow: 1px 1px 4px #e9f2f5;
-}
-
-@media only screen and (max-width: 600px) {
-    .table-wrapper {
-        overflow: scroll;
-    }
+    padding: 10px;
+    background: aliceblue;
+    overflow-x: scroll;
 }
 
 .table{
-    display: flex;
+    /* display: flex;
     flex-direction: row;
     justify-content: space-around;
-    width: 100%;
+    width: 100%; */
 }
 
 .table-body {
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-content: stretch;
     justify-content: flex-start;
     align-items: center;
+    border-radius: 3px;
 }
 
-.table td:nth-child(1) {
+.table tr:nth-child(1) {
     background-color: #8ec4ee;
-    text-shadow: 1px 1px 4px #00223b;
+    text-shadow: 1px 1px 8px #00223b;
     color: white;
 }
 
-.table td:nth-child(2n+3) {
+.table tr:nth-child(2n+3) {
     background-color: #7f91a4;
     text-shadow: 0px 0px 6px #00223b;
     color: white;
 }
 
-.column {
-    
+.row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    width: 100%;
 }
 
 .row-item {
-    padding: 10px;
+    padding: 5px;
+    margin: 5px;
     text-align: center;
     border-collapse: collapse;
     display: flex;
+    justify-content: space-between;
+    /* display: flex;
     flex-direction: row;
     align-content: stretch;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-/* .column:first-child {
-    border-top-width: 0px;
-}
-
-.column:last-child {
-    border-bottom-width: 0px;
-} */
-
-tr {
+    justify-content: space-between;
+    align-items: center; */
     width: 100%;
+    min-width: 150px;
+    line-height: 1.6em;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    overflow-y: scroll;
+    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none; /* Firefox */
+}
+
+.row-item::-webkit-scrollbar { /* for Chrome, Safari, and Opera */
+    display: none; 
+}
+
+
+.line-count-5 {
+    max-height: 7.5em;
+    -webkit-line-clamp: 5;
+}
+
+.sort {
+    transform: rotate(-90deg);
 }
 
 

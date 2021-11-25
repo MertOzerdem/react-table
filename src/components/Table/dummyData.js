@@ -4,7 +4,7 @@ const tableData = [
         id: 1,
         name: "John",
         age: "25",
-        address: "123 Main St",
+        address: "123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St123 Main St",
     },
     {
         id: 2,
@@ -176,4 +176,21 @@ const tableData = [
     }
 ];
 
-export default tableData;
+const tableData2 = [
+    {
+        id: 29,
+        name: "Jill",
+        age: "22",
+        address: "456 Main St",
+        test1: "test1",
+        test2: "test2",
+        test3: "test3",
+        test4: "test4",
+        test5: "test5",
+    }
+];
+
+export {
+    tableData,
+    tableData2
+};
