@@ -26,8 +26,10 @@ const Filter = (props) => {
         to: { opacity: 1, x: 0 },
         config: { friction: 10, tension: 30 },
     });
-    const filters = ['=', 'contains']
-    const headers = Object.keys(props.data[0]);
+    const filters = ['=', 'contains'];
+
+    const headers = props.data
+
     const [filterEquation, setFilterEquation] = useState({ value: filters[0] });
     const [selectedHeader, setselectedHeader] = useState({ value: headers[0] });
     const [filterText, setFilterText] = useState('');
@@ -51,19 +53,7 @@ const Filter = (props) => {
             filter: filterText,
             id: props.id
         });
-    }, [filterText, selectedHeader, filterEquation])
-
-    // const filterData = (selectedHeader, filterEquation, filterText) => {
-    //     let filterFunction = () => {}
-    //     if (filterEquation === '=') {
-    //         filterFunction = (o) => { return o[selectedHeader] == filterText }
-    //     }
-    //     else if (filterEquation === 'contains') {
-    //         filterFunction = (o) => { return o[selectedHeader].toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1 }
-    //     }
-
-    //     console.log(_.filter(props.data, filterFunction)); // return this to parent
-    // }
+    }, [filterText, selectedHeader, filterEquation]);
 
     return (
         <animated.div style={style} className={styles['filter-wrapper']}>
@@ -83,11 +73,9 @@ const Filter = (props) => {
             </select>
 
             <input className={styles['filter-field']} value={filterText} onChange={handleFilterText} type="text" placeholder="Filter" />
-            {/* <button className={styles['filter-button']} onClick={() => filterData(selectedHeader.value, filterEquation.value, filterText)}>Filter</button> */}
         </animated.div>
     )
 }
-
 
 const Table = (props) => {
     const [filterArray, setFilterArray] = useState([]);
@@ -160,21 +148,13 @@ const Table = (props) => {
         })
 
         console.log(filterObjects)
-        // let filterFunction = () => {}
-        // if (filterEquation === '=') {
-        //     filterFunction = (o) => { return o[selectedHeader] == filterText }
-        // }
-        // else if (filterEquation === 'contains') {
-        //     filterFunction = (o) => { return o[selectedHeader].toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1 }
-        // }
-
-        // console.log(_.filter(props.data, filterFunction)); 
     }
 
     const FilterData = () => {
+        let tempData = tableData;
         filterObjects.forEach(object => {
-            const {filter, equation, header} = object
-            let filterFunction = () => {}
+            const { filter, equation, header } = object
+            let filterFunction = () => { }
             if (equation === '=') {
                 filterFunction = (o) => { return o[header] == filter }
             }
@@ -182,21 +162,23 @@ const Table = (props) => {
                 filterFunction = (o) => { return o[header].toString().toLowerCase().indexOf(filter.toLowerCase()) > -1 }
             }
 
-            console.log('filtered Array: ',_.filter(data, filterFunction));
+            tempData = _.filter(tempData, filterFunction)
 
-            setData(_.filter(data, filterFunction)); 
+            console.log('filtered Array: ', _.filter(tempData, filterFunction));
         });
+
+        setData(tempData);
     }
 
     return (
         <animated.div className={styles['table-wrapper']} style={style}>
             <div className={styles['button-wrapper']}>
-                <button className={styles['filter-control']} onClick={() => handleFilter('+')}>+</button>
-                <button className={styles['filter-control']} onClick={() => handleFilter('-')}>-</button>
+                <button className={`${styles['filter-button']} ${styles['filter-control']}`} onClick={() => handleFilter('+')}>+</button>
+                <button className={`${styles['filter-button']} ${styles['filter-control']}`} onClick={() => handleFilter('-')}>-</button>
                 <button className={styles['filter-button']} onClick={FilterData}>Filter</button>
             </div>
             {filterArray.map((filter, key) => {
-                return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={data} />
+                return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={columnHeaders} />
             })}
             <table className={styles.table}>
                 <tbody className={styles['table-body']}>
