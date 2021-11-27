@@ -13,34 +13,43 @@ const Cell = (props) => {
     )
 }
 
+const Selector = (props) => {
+    const { className, defaultOption, handler = () => {}, options = [] } = props;
+
+    return (
+        <select className={className} value={defaultOption} onChange={handler}>
+            {options.map((option, key) => {
+                return (
+                    <option key={key} value={option}>{option}</option>
+                )
+            })}
+        </select>
+    )
+}
+
 const Pagination = (props) => {
+    const { className, options = [[10, 20], 20] } = props;
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState({ value: options[1] });
 
     const handleChangePage = (event, newPage) => {
         setCurrentPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+    const handleChangeRowsPerPage = (e) => {
+        setRowsPerPage({ value: e.target.value });
         setCurrentPage(1);
     };
 
     return (
         <div className={styles['pagination-wrapper']}>
-            
+            <p>Rows Per Page: </p>
+            <Selector className={className} defaultOption={rowsPerPage.value} options={options[0]} handler={handleChangeRowsPerPage}/>
         </div>
     )
 }
 
 const Filter = (props) => {
-    // const style = useTransition({
-    //     from: { opacity: 0, x: -200 },
-    //     enter: { opacity: 1, x: 0 },
-    //     leave: { opacity: 0, x: -200 },
-    //     config: { friction: 10, tension: 30 },
-    // })
-
     const style = useSpring({
         from: { opacity: 0, y: -50 },
         to: { opacity: 1, y: 0 },
@@ -77,21 +86,8 @@ const Filter = (props) => {
 
     return (
         <animated.div style={style} className={styles['filter-wrapper']}>
-            <select className={styles['filter-select']} value={selectedHeader.value} onChange={handleHeader}>
-                {headers.map((header, key) => {
-                    return (
-                        <option key={key} value={header}>{header}</option>
-                    )
-                })}
-            </select>
-            <select className={styles['filter-select']} value={filterEquation.value} onChange={handleFilterEquation}>
-                {filters.map((filter, key) => {
-                    return (
-                        <option key={key} value={filter}>{filter}</option>
-                    )
-                })}
-            </select>
-
+            <Selector className={styles['filter-select']} defaultOption={selectedHeader.value} handler={handleHeader} options={headers}/>
+            <Selector className={styles['filter-select']} defaultOption={filterEquation.value} handler={handleFilterEquation} options={filters}/>
             <input className={styles['filter-field']} value={filterText} onChange={handleFilterText} type="text" placeholder="Filter..." />
         </animated.div>
     )
@@ -102,7 +98,7 @@ const Table = (props) => {
     const [filterObjects, setFilterObjects] = useState([]);
     const tableData = props.data;
     const style = useSpring({
-        from: { opacity: 0, x: -200 },
+        from: { opacity: 0, x: -50 },
         to: { opacity: 1, x: 0 },
         config: { friction: 10, tension: 30 },
     });
@@ -203,6 +199,8 @@ const Table = (props) => {
             {filterArray.map((filter, key) => {
                 return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={columnHeaders} />
             })}
+
+            <Pagination className={styles['pagination-select']} options={props.rowsPerPage}/>
             <table className={styles.table}>
                 <tbody className={styles['table-body']}>
                     <tr className={styles.row} >

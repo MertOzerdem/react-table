@@ -92,7 +92,7 @@
     display: flex;
 }
 
-.filter-select, .filter-button, .filter-field {
+.filter-select, .filter-button, .filter-field, .pagination-select {
     border-radius: 5px;
     border-width: 0px;
     margin: 10px 5px;
@@ -121,11 +121,11 @@
     justify-content: center;
 }
 
-.filter-button:focus, .filter-select:focus, .filter-field:focus {
+.filter-button:focus, .filter-select:focus, .filter-field:focus, .pagination-select {
     outline: none;
 }
 
-.filter-button:hover, .filter-select:hover {
+.filter-button:hover, .filter-select:hover, .pagination-select:hover {
     background: #7f91a4;
     color: white;
 }
@@ -135,3 +135,6 @@
     transform: translate(2px, 2px);
 }
 
+.pagination-wrapper {
+
+}
