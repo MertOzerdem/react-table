@@ -7,9 +7,9 @@ const Cell = (props) => {
     const { className, children, ...rest } = props;
 
     return (
-        <div className={props.className} {...rest}>
+        <td className={props.className} {...rest}>
             {props.children}
-        </div>
+        </td>
     )
 }
 
@@ -98,6 +98,7 @@ const Table = (props) => {
     const [filterObjects, setFilterObjects] = useState([]);
     const tableData = props.data;
     const style = useSpring({
+        delay: 500,
         from: { opacity: 0, x: -50 },
         to: { opacity: 1, x: 0 },
         config: { friction: 10, tension: 30 },
@@ -140,7 +141,6 @@ const Table = (props) => {
     }
 
     useEffect(() => {
-        console.log('s')
         sortData()
     }, [currentSort])
 
@@ -226,6 +226,7 @@ const Table = (props) => {
                     })}
                 </tbody>
             </table>
+            {/* <Pagination className={styles['pagination-select']} options={props.rowsPerPage}/> */}
         </animated.div>
     )
 }
