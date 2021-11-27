@@ -56,7 +56,7 @@
 .row-item {
     padding: 5px;
     margin: 5px;
-    text-align: center;
+    text-align: start;
     border-collapse: collapse;
     display: flex;
     justify-content: space-between;

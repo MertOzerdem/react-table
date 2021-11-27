@@ -1,7 +1,7 @@
 import styles from './Table.module.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { useSpring, animated, useTransition } from "react-spring";
+import { useSpring, animated } from "react-spring";
 
 const Cell = (props) => {
     const { className, children, ...rest } = props;
@@ -9,6 +9,26 @@ const Cell = (props) => {
     return (
         <div className={props.className} {...rest}>
             {props.children}
+        </div>
+    )
+}
+
+const Pagination = (props) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleChangePage = (event, newPage) => {
+        setCurrentPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setCurrentPage(1);
+    };
+
+    return (
+        <div className={styles['pagination-wrapper']}>
+            
         </div>
     )
 }
@@ -22,11 +42,11 @@ const Filter = (props) => {
     // })
 
     const style = useSpring({
-        from: { opacity: 0, x: -200 },
-        to: { opacity: 1, x: 0 },
+        from: { opacity: 0, y: -50 },
+        to: { opacity: 1, y: 0 },
         config: { friction: 10, tension: 30 },
     });
-    const filters = ['=', 'contains'];
+    const filters = ['=', 'contains', '>', '<'];
 
     const headers = props.data
 
@@ -72,7 +92,7 @@ const Filter = (props) => {
                 })}
             </select>
 
-            <input className={styles['filter-field']} value={filterText} onChange={handleFilterText} type="text" placeholder="Filter" />
+            <input className={styles['filter-field']} value={filterText} onChange={handleFilterText} type="text" placeholder="Filter..." />
         </animated.div>
     )
 }
@@ -117,22 +137,22 @@ const Table = (props) => {
         return [headers, sortType]
     }
 
-    const sortData = () => {
+    const sortData = (dataObject = data) => {
         const [headers, sortType] = getSortList()
-        const newData = _.orderBy(data, headers, sortType)
+        const newData = _.orderBy(dataObject, headers, sortType)
         setData(newData);
     }
+
+    useEffect(() => {
+        console.log('s')
+        sortData()
+    }, [currentSort])
 
     const handleSort = (sortTarget) => {
         sortHandler(sortTarget)
     }
 
-    useEffect(() => {
-        sortData()
-    }, [currentSort])
-
     const handleFilter = (operation) => {
-        console.log('filter', filterArray)
         if (operation === '+') {
             setFilterArray((prev) => [...prev, true])
         } else {
@@ -146,8 +166,6 @@ const Table = (props) => {
             prev[object.id] = object
             return [...prev]
         })
-
-        console.log(filterObjects)
     }
 
     const FilterData = () => {
@@ -161,13 +179,18 @@ const Table = (props) => {
             else if (equation === 'contains') {
                 filterFunction = (o) => { return o[header].toString().toLowerCase().indexOf(filter.toLowerCase()) > -1 }
             }
+            else if (equation === '>') {
+                filterFunction = (o) => { return o[header] > filter }
+            } 
+            else if (equation === '<') {
+                filterFunction = (o) => { return o[header] < filter }
+            }
 
             tempData = _.filter(tempData, filterFunction)
-
-            console.log('filtered Array: ', _.filter(tempData, filterFunction));
         });
 
         setData(tempData);
+        sortData(tempData);
     }
 
     return (
