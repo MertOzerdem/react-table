@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div className="App">
-      <Table data={tableData} rowsPerPage={rowsPerPage}>
+      <Table data={tableData} rowsPerPage={rowsPerPage} paginationText={'Rows Per Page: '}>
         <div>
           <button></button>
         </div>

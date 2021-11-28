@@ -14,7 +14,7 @@ const Cell = (props) => {
 }
 
 const Selector = (props) => {
-    const { className, defaultOption, handler = () => {}, options = [] } = props;
+    const { className, defaultOption, handler = () => { }, options = [] } = props;
 
     return (
         <select className={className} value={defaultOption} onChange={handler}>
@@ -28,12 +28,17 @@ const Selector = (props) => {
 }
 
 const Pagination = (props) => {
-    const { className, options = [[10, 20], 20] } = props;
+    const { className, options = [[10, 20], 20], pageEvent, data, paginationText } = props;
+    const icons = {
+        back: '<',
+        next: '>'
+    }
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState({ value: options[1] });
+    let chunkedData = _.chunk(data, rowsPerPage.value);
 
-    const handleChangePage = (event, newPage) => {
-        setCurrentPage(newPage);
+    const handleChangePage = (progress) => {
+        setCurrentPage(currentPage + progress);
     };
 
     const handleChangeRowsPerPage = (e) => {
@@ -41,10 +46,28 @@ const Pagination = (props) => {
         setCurrentPage(1);
     };
 
+    useEffect(() => {
+        chunkedData = _.chunk(data, rowsPerPage.value);
+        console.log('rowPer: ', rowsPerPage.value);
+        console.log('chunkedData: ', chunkedData[currentPage - 1]);
+        pageEvent(chunkedData[currentPage - 1]);
+    }, [rowsPerPage, currentPage]);
+
+    const getPageRange = () => {
+        let pageIndex = currentPage - 1;
+        let pageRange = rowsPerPage.value * pageIndex;
+        return `${pageRange}-${pageRange + (chunkedData[pageIndex] || []).length} of ${data.length}`
+    };
+
     return (
         <div className={styles['pagination-wrapper']}>
-            <p>Rows Per Page: </p>
-            <Selector className={className} defaultOption={rowsPerPage.value} options={options[0]} handler={handleChangeRowsPerPage}/>
+            <div>
+                <p>{paginationText}</p>
+                <Selector className={className} defaultOption={rowsPerPage.value} options={options[0]} handler={handleChangeRowsPerPage} />
+                {/* <div className={currentPage - 1 === 0 && styles.hide} onClick={() => handleChangePage(-1)}>{icons.back}</div> */}
+                <p>{getPageRange()}</p>
+                {/* <div className={currentPage >= chunkedData.length && styles.hide} onClick={() => handleChangePage(1)}>{icons.next}</div> */}
+            </div>
         </div>
     )
 }
@@ -86,8 +109,8 @@ const Filter = (props) => {
 
     return (
         <animated.div style={style} className={styles['filter-wrapper']}>
-            <Selector className={styles['filter-select']} defaultOption={selectedHeader.value} handler={handleHeader} options={headers}/>
-            <Selector className={styles['filter-select']} defaultOption={filterEquation.value} handler={handleFilterEquation} options={filters}/>
+            <Selector className={styles['filter-select']} defaultOption={selectedHeader.value} handler={handleHeader} options={headers} />
+            <Selector className={styles['filter-select']} defaultOption={filterEquation.value} handler={handleFilterEquation} options={filters} />
             <input className={styles['filter-field']} value={filterText} onChange={handleFilterText} type="text" placeholder="Filter..." />
         </animated.div>
     )
@@ -135,6 +158,7 @@ const Table = (props) => {
     }
 
     const sortData = (dataObject = data) => {
+        console.log('sortData: ', dataObject);
         const [headers, sortType] = getSortList()
         const newData = _.orderBy(dataObject, headers, sortType)
         setData(newData);
@@ -177,7 +201,7 @@ const Table = (props) => {
             }
             else if (equation === '>') {
                 filterFunction = (o) => { return o[header] > filter }
-            } 
+            }
             else if (equation === '<') {
                 filterFunction = (o) => { return o[header] < filter }
             }
@@ -199,8 +223,7 @@ const Table = (props) => {
             {filterArray.map((filter, key) => {
                 return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={columnHeaders} />
             })}
-
-            <Pagination className={styles['pagination-select']} options={props.rowsPerPage}/>
+            
             <table className={styles.table}>
                 <tbody className={styles['table-body']}>
                     <tr className={styles.row} >
@@ -214,6 +237,7 @@ const Table = (props) => {
                     </tr>
 
                     {data.map((cell) => {
+                        {console.log(cell)}
                         return (
                             <tr key={cell.id} className={styles.row}>
                                 {columnHeaders.map((header, key) => {
@@ -226,7 +250,10 @@ const Table = (props) => {
                     })}
                 </tbody>
             </table>
-            {/* <Pagination className={styles['pagination-select']} options={props.rowsPerPage}/> */}
+            <Pagination className={styles['pagination-select']} options={props.rowsPerPage} data={props.data} paginationText={props.paginationText} 
+            pageEvent={data => {
+                console.log('pagination end: ', data);
+                sortData(data)}} />
         </animated.div>
     )
 }

@@ -138,3 +138,7 @@
 .pagination-wrapper {
 
 }
+
+.hide {
+    display: none;
+}
