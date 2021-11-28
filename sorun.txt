@@ -1,3 +1,0 @@
-boş filtre yaparken hata atıyor
-filtre yaptıktan sonra eğer 2. sayfadaysan ilk filtre daha az sonuç dönerse hata atıyor.
-    - filtre sonrası ilk sayfaya dönülmeli

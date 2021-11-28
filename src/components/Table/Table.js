@@ -28,7 +28,7 @@ const Selector = (props) => {
 }
 
 const Pagination = (props) => {
-    const { className, options = [[10, 20], 20], pageEvent, data, paginationText, paginationData } = props;
+    const { className, options = [[10, 20], 10], pageEvent, data, paginationText, paginationData } = props;
     const icons = {
         back: '<',
         next: '>'
@@ -37,8 +37,6 @@ const Pagination = (props) => {
     const [rowsPerPage, setRowsPerPage] = useState({ value: paginationData.rowsPerPage });
     let chunkedData = _.chunk(data, rowsPerPage.value);
 
-    console.log('reset', props.reset)
-    console.log('paginationData.currentPage', paginationData.currentPage)
     const handleChangePage = (progress) => {
         setCurrentPage(currentPage + progress);
     };
@@ -63,13 +61,11 @@ const Pagination = (props) => {
 
     return (
         <div className={styles['pagination-wrapper']}>
-            <div>
-                <p>{paginationText}</p>
-                <Selector className={className} defaultOption={rowsPerPage.value} options={options[0]} handler={handleChangeRowsPerPage} />
-                <div className={currentPage - 1 === 0 ? styles.hide : ''} onClick={() => handleChangePage(-1)}>{icons.back}</div>
-                <p>{getPageRange()}</p>
-                <div className={currentPage >= chunkedData.length ? styles.hide : ''} onClick={() => handleChangePage(1)}>{icons.next}</div>
-            </div>
+            <p>{paginationText}</p>
+            <Selector className={`${className} ${styles['pagination-selector']}`} defaultOption={rowsPerPage.value} options={options[0]} handler={handleChangeRowsPerPage} />
+            <div className={currentPage - 1 === 0 ? styles.hide : styles['pagination-icon']} onClick={() => handleChangePage(-1)}>{icons.back}</div>
+            <p className={styles['pagination-text']}>{getPageRange()}</p>
+            <div className={currentPage >= chunkedData.length ? styles.hide : styles['pagination-icon']} onClick={() => handleChangePage(1)}>{icons.next}</div>
         </div>
     )
 }
@@ -125,7 +121,6 @@ const Table = (props) => {
         to: { opacity: 1, x: 0 },
         config: { friction: 10, tension: 30 },
     });
-    const [reset, setReset] = useState(false);
     const [filteredTableData, setFilteredTableData] = useState(props.data);
     const columnHeaders = Object.keys(tableData[0]);
     const [data, setData] = useState(tableData);
@@ -170,12 +165,12 @@ const Table = (props) => {
         sortData: (dataObject = data) => {
             let headers = []
             let sortType = []
-    
+
             for (const [key, value] of Object.entries(currentSort)) {
                 headers.push(key)
                 sortType.push(value)
             }
-    
+
             return _.orderBy(dataObject, headers, sortType);
         }
     }
@@ -184,8 +179,6 @@ const Table = (props) => {
         FilterData: () => {
             let tempData = tableData;
             filterObjects.forEach(object => {
-                // debugger
-                setReset(true);
                 const { filter, equation, header } = object
                 let filterFunction = () => { }
                 if (equation === '=') {
@@ -200,7 +193,7 @@ const Table = (props) => {
                 else if (equation === '<') {
                     filterFunction = (o) => { return o[header] < filter }
                 }
-    
+
                 tempData = _.filter(tempData, filterFunction)
             });
 
@@ -211,7 +204,6 @@ const Table = (props) => {
     const pagination = {
         handlePagination: (paginationData) => {
             setPaginationedData(paginationData)
-            setReset(false);
         },
         paginateTable: (data) => {
             const chunkData = _.chunk(data, paginatedData.rowsPerPage);
@@ -228,12 +220,7 @@ const Table = (props) => {
         tempData = sort.sortData(tempData);
         tempData = pagination.paginateTable(tempData);
 
-        if(!tempData) {
-            setData([]);
-            return;
-        }
-
-        setData(tempData);
+        setData(!tempData ? [] : tempData);
     }
 
     useEffect(() => {
@@ -250,13 +237,13 @@ const Table = (props) => {
             {filterArray.map((filter, key) => {
                 return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={columnHeaders} />
             })}
-            
+
             <table className={styles.table}>
                 <tbody className={styles['table-body']}>
                     <tr className={styles.row} >
                         {columnHeaders.map((header, key) => {
                             return (
-                                <td key={key} className={styles['row-item']} onClick={() => sort.handleSort(header)}>{header}
+                                <td key={key} className={`${styles['row-item-header']} ${styles['row-item']}`} onClick={() => sort.handleSort(header)}>{header}
                                     <div className={styles.sort}>{currentSort[header] === 'asc' ? '<' : '>'}</div>
                                 </td>
                             )
@@ -268,7 +255,7 @@ const Table = (props) => {
                             <tr key={cell.id} className={styles.row}>
                                 {columnHeaders.map((header, key) => {
                                     return (
-                                        <Cell key={key} className={`${styles['row-item']} ${styles['line-count-5']}`} item={cell}>{cell[header]}</Cell>
+                                        <Cell key={key} className={`${styles['row-item']} ${styles['line-count-5']}`}>{cell[header]}</Cell>
                                     )
                                 })}
                             </tr>
@@ -276,7 +263,7 @@ const Table = (props) => {
                     })}
                 </tbody>
             </table>
-            <Pagination className={styles['pagination-select']} reset={reset} options={props.rowsPerPage} paginationData={paginatedData} data={filteredTableData} paginationText={props.paginationText} pageEvent={data => pagination.handlePagination(data)} />
+            <Pagination className={styles['pagination-select']} options={props.rowsPerPage} paginationData={paginatedData} data={filteredTableData} paginationText={props.paginationText} pageEvent={data => pagination.handlePagination(data)} />
         </animated.div>
     )
 }
