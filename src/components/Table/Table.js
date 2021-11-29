@@ -28,7 +28,7 @@ const Selector = (props) => {
 }
 
 const Pagination = (props) => {
-    const { className, options = [[10, 20], 10], pageEvent, data, paginationText, paginationData } = props;
+    const { className, options = [[10, 20], 10], pageEvent, data, paginationText, paginationData, filterChanged } = props;
     const icons = {
         back: '<',
         next: '>'
@@ -52,6 +52,11 @@ const Pagination = (props) => {
             rowsPerPage: Number(rowsPerPage.value),
         });
     }, [rowsPerPage, currentPage]);
+
+    useEffect(() => {
+        setRowsPerPage({ value: paginationData.rowsPerPage });
+        setCurrentPage(1);
+    }, [filterChanged]);
 
     const getPageRange = () => {
         let pageIndex = currentPage - 1;
@@ -126,6 +131,7 @@ const Table = (props) => {
     const [data, setData] = useState(tableData);
     const [filterArray, setFilterArray] = useState([]);
     const [filterObjects, setFilterObjects] = useState([]);
+    const [filterChanged, setFilterChanged] = useState(false);
     const [paginatedData, setPaginationedData] = useState({
         currentPage: 1,
         rowsPerPage: props.rowsPerPage[1],
@@ -212,13 +218,17 @@ const Table = (props) => {
         }
     }
 
-    const setTableData = () => {
+    const setTableData = (isCalledDirect = false) => {
         let tempData = filter.FilterData();
 
         setFilteredTableData(tempData);
 
         tempData = sort.sortData(tempData);
         tempData = pagination.paginateTable(tempData);
+
+        if (isCalledDirect) {
+            setFilterChanged(prev => !prev)
+        }
 
         setData(!tempData ? [] : tempData);
     }
@@ -232,7 +242,7 @@ const Table = (props) => {
             <div className={styles['button-wrapper']}>
                 <button className={`${styles['filter-button']} ${styles['filter-control']}`} onClick={() => addRemoveFilter('+')}>+</button>
                 <button className={`${styles['filter-button']} ${styles['filter-control']}`} onClick={() => addRemoveFilter('-')}>-</button>
-                <button className={styles['filter-button']} onClick={setTableData}>Filter</button>
+                <button className={styles['filter-button']} onClick={() => setTableData(true)}>Filter</button>
             </div>
             {filterArray.map((filter, key) => {
                 return filter && <Filter getFilterValue={getFilterValue} id={key} key={key} data={columnHeaders} />
@@ -263,7 +273,7 @@ const Table = (props) => {
                     })}
                 </tbody>
             </table>
-            <Pagination className={styles['pagination-select']} options={props.rowsPerPage} paginationData={paginatedData} data={filteredTableData} paginationText={props.paginationText} pageEvent={data => pagination.handlePagination(data)} />
+            <Pagination className={styles['pagination-select']} options={props.rowsPerPage} paginationData={paginatedData} data={filteredTableData} filterChanged={filterChanged} paginationText={props.paginationText} pageEvent={data => pagination.handlePagination(data)} />
         </animated.div>
     )
 }
